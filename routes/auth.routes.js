@@ -11,7 +11,7 @@ router.post("/signup", async (req, res, next) => {
 
   //creamos usuario en la base de datos
   if (!username || !email || !password) {
-    res.json({ errorMessage: "todos los campos tienen que estar llenos" });
+    res.status(400).json({ errorMessage: "todos los campos tienen que estar llenos" });
     return;
   }
 
@@ -38,6 +38,7 @@ router.post("/signup", async (req, res, next) => {
       password: passwordHash,
       //verifyPassword:""
     });
+    res.json("usuario creado")
   } catch (error) {
     next(error);
   }
@@ -54,7 +55,7 @@ router.post("/login", async (req, res, next) => {
     if (foundUser === null) {
       res.status(400).json({
         errorMessage:
-          "Ya existe un usuario con nombre de usuario o correo electronico",
+          "El correo electronico no es correcto",
       });
 
       return; // clausula de guardia

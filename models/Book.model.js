@@ -12,7 +12,12 @@ const bookSchema = new Schema({
     type:String
   },
   tematica:{
-    type:String
+    type:String,
+    enum:["Amoroso",
+      "Histórico",
+      "Aventuras",
+      "Policial",
+      "Fantástico"]
   },
   isBorrowed:{ 
     type: Boolean, 

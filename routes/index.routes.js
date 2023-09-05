@@ -127,7 +127,9 @@ router.put("/coleccion/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const book = await Book.findByIdAndUpdate(id, { isBorrowed: false });
-    res.json({ message: "Libro devuelto" });
+
+    const userRole = req.payload.role;
+    res.json(book, userRole);
   } catch (error) {
     next(error);
   }
@@ -141,7 +143,9 @@ router.get("/gestion", async (req, res, next) => {
   try {
     const prestados = await Book.find({ isBorrowed: true });
 
-    res.json(prestados);
+    const userRole = req.payload.role;
+
+    res.json(prestados,userRole );
   } catch (error) {
     next(error);
   }

@@ -1,11 +1,9 @@
 const router = require("express").Router();
 const express = require("express");
-const Book= require ("../models/Book.model")
-const Comment= require("../models/Comment.model")
-const User= require ("../models/User.model")
-const isAuthenticated= require ("../middlewares/isAuthenticated.js")
-
-
+const Book = require("../models/Book.model");
+const Comment = require("../models/Comment.model");
+const User = require("../models/User.model");
+const isAuthenticated = require("../middlewares/isAuthenticated.js");
 
 router.get("/", (req, res, next) => {
   res.json("All good in here");
@@ -18,18 +16,21 @@ router.use("/auth", authRouter);
 
 router.get("/home", isAuthenticated, async (req, res, next) => {
   try {
-   
-    // const userId = req.params.id; 
-    const user = req.payload
-   console.log(user , "hola")
+    // const userId = req.params.id;
+    const user = req.payload._id;
+    const userData=await  User.findById(user)
 
-    res.json({ "username": user.username });
+    
+    
+
+
+    res.json({ userData });
   } catch (error) {
     next(error);
   }
 });
 
-//añadir 
+//añadir
 
 router.post("/anadir", async (req, res, next) => {
   try {
@@ -47,7 +48,7 @@ router.post("/anadir", async (req, res, next) => {
 
 router.get("/coleccion", async (req, res, next) => {
   try {
-    const books = await Book.find().select({title:1})
+    const books = await Book.find().select({ title: 1 });
 
     res.json(books);
   } catch (error) {
@@ -55,15 +56,17 @@ router.get("/coleccion", async (req, res, next) => {
   }
 });
 
-
 //detalles
 //para listar el libro
 router.get("/coleccion/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
-  console.log(id)
+  console.log(id);
   try {
-    const book = await Book.findById(id).populate("prestamo", "username")
-    const comments = await Comment.find({ libro: id }).populate("autor", "username")
+    const book = await Book.findById(id).populate("prestamo", "username");
+    const comments = await Comment.find({ libro: id }).populate(
+      "autor",
+      "username"
+    );
     const userRole = req.payload.role; // si es admin o user
 
     res.json({ book, userRole, comments });
@@ -72,18 +75,17 @@ router.get("/coleccion/:id", isAuthenticated, async (req, res, next) => {
   }
 });
 
-
 // agregar comentario
 router.post("/coleccion/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   const { nuevoComentario } = req.body;
-  const autor = req.payload._id; //  ID  usuario 
-console.log(req.body)
+  const autor = req.payload._id; //  ID  usuario
+  console.log(req.body);
   try {
-     const newComent = {
+    const newComent = {
       libro: id,
       autor,
-      contenido:nuevoComentario,
+      contenido: nuevoComentario,
     };
 
     await Comment.create(newComent);
@@ -94,12 +96,12 @@ console.log(req.body)
   }
 });
 
-
-
-//borrar comentario 
-router.delete("/coleccion/:id", async (req, res, next) => {
-  const { commentId } = req.params;
+//borrar comentario
+router.delete("/comentarios/:commentId", async (req, res, next) => {
+  const { commentId  } = req.params;
   try {
+
+
     await Comment.findByIdAndDelete(commentId);
     res.json({ message: "Comentario eliminado" });
   } catch (error) {
@@ -108,6 +110,16 @@ router.delete("/coleccion/:id", async (req, res, next) => {
 });
 
 
+//borrar un libro
+router.delete("/coleccion/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    await Book.findByIdAndDelete(id);
+    res.json({ message: "Libro eliminado" });
+  } catch (error) {
+    next(error);
+  }
+});
 
 
 // devolver un libro prestado
@@ -121,16 +133,7 @@ router.put("/coleccion/:id", async (req, res, next) => {
   }
 });
 
-//borrar un libro
-router.delete("/coleccion/:id", async (req, res, next) => {
-  const { id } = req.params;
-  try {
-    await Book.findByIdAndDelete(id);
-    res.json({ message: "Libro eliminado" });
-  } catch (error) {
-    next(error);
-  }
-});
+
 
 //gestion
 //listado de prestados
@@ -144,23 +147,18 @@ router.get("/gestion", async (req, res, next) => {
   }
 });
 
-
-
-
-// buscar libro 
+// buscar libro
 router.get("/busqueda", async (req, res, next) => {
   try {
     const { title, author, tematica } = req.query;
 
     const query = {};
 
-    if (title) query.title = { $regex: title, $options: 'i' };
-    if (author) query.author = { $regex: author, $options: 'i' };
-    if (tematica) query.tematica = { $regex: tematica, $options: 'i' };
+    if (title) query.title = { $regex: title, $options: "i" };
+    if (author) query.author = { $regex: author, $options: "i" };
+    if (tematica) query.tematica = { $regex: tematica, $options: "i" };
 
-    const libros = await Book.find(query)
-
-
+    const libros = await Book.find(query);
 
     res.json(libros);
   } catch (error) {
@@ -170,17 +168,46 @@ router.get("/busqueda", async (req, res, next) => {
   //resultado
   router.get("/resultados", async (req, res, next) => {
     try {
-      const libros = await Book.find(query, "title")
-
+      const libros = await Book.find(query, "title");
     } catch (error) {
       next(error);
-    }   
+    }
     res.json(libros);
-  })
-
-
+  });
 });
 
+//perfil
 
+router.get("/perfil", isAuthenticated, async (req, res, next) => {
+  try {
+    // const userId = req.params.id;
+    const user = req.payload._id;
+    const userData=await  User.findById(user)
+
+    
+    
+
+
+    res.json({ userData });
+  } catch (error) {
+    next(error);
+  }
+});
+
+//editarperfil
+
+router.patch("/editarperfil", isAuthenticated, async (req, res, next) => {
+  try {
+   const elId=req.payload._id
+    const user = req.body.username;
+    
+    await User.findByIdAndUpdate(elId , {username:user});
+
+
+    res.json({ username: user.username, email: user.email });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

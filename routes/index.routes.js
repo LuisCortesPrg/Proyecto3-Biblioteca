@@ -71,6 +71,30 @@ router.get("/coleccion/:id", isAuthenticated, async (req, res, next) => {
   }
 });
 
+
+// agregar comentario
+router.post("/coleccion/:id", isAuthenticated, async (req, res, next) => {
+  const { id } = req.params;
+  const { contenido } = req.body;
+  const autor = req.payload.userId; //  ID  usuario 
+
+  try {
+    const newComment = new Comment({
+      libro: id,
+      autor,
+      contenido,
+    });
+
+    await newComment.create();
+
+    res.json({ message: "Comentario agregado" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
 //borrar comentario 
 router.delete("/coleccion/:id", async (req, res, next) => {
   const { commentId } = req.params;
@@ -84,16 +108,6 @@ router.delete("/coleccion/:id", async (req, res, next) => {
 
 
 
-// borrar un libro
-router.delete("/coleccion/:id", async (req, res, next) => {
-  const { id } = req.params;
-  try {
-    await Book.findByIdAndDelete(id);
-    res.json({ message: "Libro eliminado" });
-  } catch (error) {
-    next(error);
-  }
-});
 
 // devolver un libro prestado
 router.put("/coleccion/:id", async (req, res, next) => {

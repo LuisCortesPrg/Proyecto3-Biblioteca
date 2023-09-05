@@ -60,12 +60,13 @@ router.get("/coleccion", async (req, res, next) => {
 //para listar el libro
 router.get("/coleccion/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
+  console.log(id)
   try {
     const book = await Book.findById(id).populate("prestamo", "username")
     const comments = await Comment.find({ libro: id }).populate("autor", "username")
     const userRole = req.payload.role; // si es admin o user
 
-    res.json({ book, comments, userRole });
+    res.json({ book, userRole, comments });
   } catch (error) {
     next(error);
   }
@@ -75,17 +76,17 @@ router.get("/coleccion/:id", isAuthenticated, async (req, res, next) => {
 // agregar comentario
 router.post("/coleccion/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
-  const { contenido } = req.body;
-  const autor = req.payload.userId; //  ID  usuario 
-
+  const { nuevoComentario } = req.body;
+  const autor = req.payload._id; //  ID  usuario 
+console.log(req.body)
   try {
-    const newComment = new Comment({
+     const newComent = {
       libro: id,
       autor,
-      contenido,
-    });
+      contenido:nuevoComentario,
+    };
 
-    await newComment.create();
+    await Comment.create(newComent);
 
     res.json({ message: "Comentario agregado" });
   } catch (error) {

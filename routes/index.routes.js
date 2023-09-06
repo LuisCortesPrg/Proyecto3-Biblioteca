@@ -38,7 +38,9 @@ router.post("/anadir", async (req, res, next) => {
 
     const newBook = await Book.create({ title, description, author, tematica });
 
-    res.json(newBook);
+    const userRole = req.payload.role;
+    res.json(newBook, userRole);
+  
   } catch (error) {
     next(error);
   }
@@ -111,7 +113,7 @@ router.delete("/comentarios/:commentId", async (req, res, next) => {
 
 
 //borrar un libro
-router.delete("/coleccion/:id", async (req, res, next) => {
+router.delete("/borrar-libro/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     await Book.findByIdAndDelete(id);
@@ -123,7 +125,7 @@ router.delete("/coleccion/:id", async (req, res, next) => {
 
 
 // devolver un libro prestado
-router.put("/coleccion/:id", async (req, res, next) => {
+router.put("/devolver/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const book = await Book.findByIdAndUpdate(id, { isBorrowed: false });
@@ -205,7 +207,7 @@ router.patch("/editarperfil", isAuthenticated, async (req, res, next) => {
    const elId=req.payload._id
     const user = req.body.username;
     
-    await User.findByIdAndUpdate(elId , {username:user});
+    await User.findByIdAndUpdate(elId , {username:user})
 
 
     res.json({ username: user.username, email: user.email });
@@ -214,4 +216,22 @@ router.patch("/editarperfil", isAuthenticated, async (req, res, next) => {
   }
 });
 
+
+//editar libro
+router.put("/editarLibro", isAuthenticated, async (req, res, next) => {
+  try {
+    const userRole = req.payload.role;
+    const { title, author, description, tematica } = req.body
+    
+    const response= await Book.findByIdAndUpdate(req.params.book, {title, author, description, tematica})
+
+
+    res.json(response, userRole );
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
+
+

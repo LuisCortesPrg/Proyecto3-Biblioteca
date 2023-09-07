@@ -161,30 +161,7 @@ router.get("/gestion", async (req, res, next) => {
   }
 });
 
-// buscar libro
-router.get("/busqueda", async (req, res, next) => {
-  try {
-    const { title, author, tematica } = req.body; //valores del formulario
 
-      
-
-    const libros = await Book.find().select({ title: 1 },{author:1},{tematica:1});
-
-    res.json(req.body, libros);
-  } catch (error) {
-    next(error);
-  }
-
-  //resultado
-  router.get("/resultados", async (req, res, next) => {
-    try {
-      const libros = await Book.find(query, "title");
-    } catch (error) {
-      next(error);
-    }
-    res.json(libros);
-  });
-});
 
 //perfil
 

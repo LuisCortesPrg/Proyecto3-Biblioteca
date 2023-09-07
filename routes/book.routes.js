@@ -132,10 +132,32 @@ router.put("/editarLibro/:id", isAuthenticated, async (req, res, next) => {
       next(error);
     }
   
+    });
+
+    // buscar libro
+    router.get("/buscarlibro", async (req, res, next) => {
+        try {
+          const allBooks = await Book.find()
+      
+          res.json(allBooks);
+        } catch (error) {
+          next(error);
+        }
+      });
+  
+    //resultado
+    // router.get("/resultados", async (req, res, next) => {
+    //   try {
+    //     const libros = await Book.find(query, "title");
+    //   } catch (error) {
+    //     next(error);
+    //   }
+    //   res.json(libros);
+    // });
+
   
   
-  
-  })
+ 
   
 
 

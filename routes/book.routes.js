@@ -145,15 +145,7 @@ router.put("/editarLibro/:id", isAuthenticated, async (req, res, next) => {
         }
       });
   
-    //resultado
-    // router.get("/resultados", async (req, res, next) => {
-    //   try {
-    //     const libros = await Book.find(query, "title");
-    //   } catch (error) {
-    //     next(error);
-    //   }
-    //   res.json(libros);
-    // });
+    
 
   
   

@@ -33,13 +33,15 @@ router.get("/home", isAuthenticated, async (req, res, next) => {
 //añadir
 
 router.post("/anadir", async (req, res, next) => {
+const { title, description, author, tematica } = req.body;
+
   try {
-    const { title, description, author, tematica } = req.body;
+    
 
     const newBook = await Book.create({ title, description, author, tematica });
 
-    const userRole = req.payload.role;
-    res.json(newBook, userRole);
+    
+    res.json(newBook);
   
   } catch (error) {
     next(error);
@@ -69,9 +71,9 @@ router.get("/coleccion/:id", isAuthenticated, async (req, res, next) => {
       "autor",
       "username"
     );
-    const userRole = req.payload.role; // si es admin o user
 
-    res.json({ book, userRole, comments });
+
+    res.json({ book, comments });
   } catch (error) {
     next(error);
   }
@@ -156,17 +158,13 @@ router.get("/gestion", async (req, res, next) => {
 // buscar libro
 router.get("/busqueda", async (req, res, next) => {
   try {
-    const { title, author, tematica } = req.query;
+    const { title, author, tematica } = req.body; //valores del formulario
 
-    const query = {};
+      
 
-    if (title) query.title = { $regex: title, $options: "i" };
-    if (author) query.author = { $regex: author, $options: "i" };
-    if (tematica) query.tematica = { $regex: tematica, $options: "i" };
+    const libros = await Book.find().select({ title: 1 },{author:1},{tematica:1});
 
-    const libros = await Book.find(query);
-
-    res.json(libros);
+    res.json(req.body, libros);
   } catch (error) {
     next(error);
   }
@@ -218,19 +216,38 @@ router.patch("/editarperfil", isAuthenticated, async (req, res, next) => {
 
 
 //editar libro
-router.put("/editarLibro", isAuthenticated, async (req, res, next) => {
+router.put("/editarLibro/:id", isAuthenticated, async (req, res, next) => {
   try {
-    const userRole = req.payload.role;
+    
     const { title, author, description, tematica } = req.body
     
-    const response= await Book.findByIdAndUpdate(req.params.book, {title, author, description, tematica})
+    const response= await Book.findByIdAndUpdate(req.params.id, {title, author, description, tematica})
 
 
-    res.json(response, userRole );
+    res.json(response);
   } catch (error) {
     next(error);
   }
 });
+
+router.get ("/editarLibro/:id", isAuthenticated, async (req, res, next) =>{
+try{
+  const { id } = req.params;
+
+  const book = await Book.findById(id)
+
+
+res.json(book)
+
+}catch (error) {
+    next(error);
+  }
+
+
+
+
+})
+
 
 module.exports = router;
 
